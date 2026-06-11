@@ -228,6 +228,23 @@ begin
   return jsonb_build_object('ok', true);
 end; $$;
 
+-- 2c. Begin the works (host). role_reveal → work_proposal once roles are read.
+create or replace function harvest.begin_works(p_session_id uuid, p_host_id text)
+returns jsonb language plpgsql security definer
+set search_path = harvest, public as $$
+declare s record;
+begin
+  if not exists (select 1 from harvest.sessions where id=p_session_id and host_id=p_host_id) then
+    raise exception 'Not the host'; end if;
+  select * into s from harvest.sessions where id=p_session_id;
+  if s.phase <> 'role_reveal' then return jsonb_build_object('ok', false, 'error', 'Feil fase'); end if;
+  update harvest.sessions
+    set phase='work_proposal', current_work=1, current_attempt=1,
+        leader_seat=0, reject_count=0, proposed_team='{}'
+    where id=p_session_id;
+  return jsonb_build_object('ok', true);
+end; $$;
+
 -- 3. Saulus converts (Acts 9). Public, irreversible, blinding.
 create or replace function harvest.convert_saul(p_player_id uuid, p_secret text)
 returns jsonb language plpgsql security definer
@@ -364,7 +381,8 @@ begin
       reject_count = reject_count + 1,
       leader_seat = (leader_seat + 1) % player_count,
       current_attempt = current_attempt + 1,
-      proposed_team = '{}'
+      proposed_team = '{}',
+      phase = 'work_proposal'          -- next Elder proposes
       where id = p_session_id;
   end if;
   insert into harvest.events (session_id,type,payload)
@@ -475,9 +493,10 @@ begin
   return (
     select jsonb_agg(jsonb_build_object(
       'name', p.name, 'seat', p.seat, 'role', pr.role, 'team', pr.team,
-      'converted', pr.converted, 'converted_on_work', pr.converted_on_work))
+      'converted', pr.converted, 'converted_on_work', pr.converted_on_work)
+      order by p.seat)
     from harvest.players p join harvest.player_roles pr on pr.player_id=p.id
-    where p.session_id = p_session_id order by p.seat);
+    where p.session_id = p_session_id);
 end; $$;
 
 -- 10. Presence helpers (best-effort online state).
@@ -492,7 +511,7 @@ end; $$;
 
 grant execute on function
   harvest.join_session, harvest.commit_deal, harvest.get_my_role, harvest.confirm_role,
-  harvest.convert_saul, harvest.propose_team, harvest.cast_vote, harvest.vote_progress,
+  harvest.begin_works, harvest.convert_saul, harvest.propose_team, harvest.cast_vote, harvest.vote_progress,
   harvest.resolve_vote, harvest.submit_card, harvest.work_progress, harvest.resolve_work,
   harvest.judas_strike, harvest.get_final_reveal, harvest.set_online
   to anon, authenticated;

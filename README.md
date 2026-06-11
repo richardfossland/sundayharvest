@@ -33,6 +33,19 @@ Supabase-prosjektet (samme som Chess/Market/Turnering/Quiz — gratis-takets
 2. **Settings → API → Exposed schemas → legg til `harvest` → Save.**
    Uten dette router ikke PostgREST `harvest.*`-kall, og create/join feiler.
 
+### Test
+
+```bash
+./scripts/test-db.sh   # krever Docker
+```
+
+Spinner opp en kastbar `postgres:16`, kjører migrasjonen to ganger (idempotens),
+og driver hele spill-logikken gjennom RPC-ene — 56 assertions som dekker
+hemmelighold (feil secret blokkeres, Profeten ser ikke Slangen), avstemnings-
+matematikk (full-roster nevner, Barnabas ×2, fravær=avvis, 5-avvis-abandon),
+gjerningsoppgjør (ett ugress kveler, to-ugress-regelen, trofast tvinges til
+frukt), Judas-endgame og Saulus-omvendelse. Kjøres mot ekte Postgres, ikke mock.
+
 ## Sikkerhetsmodell
 
 Ingen brukerautentisering. Hemmelighold håndheves server-side:

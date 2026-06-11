@@ -140,7 +140,37 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
         </div>
       )}
 
-      {session.phase !== 'lobby' && (
+      {session.phase === 'role_reveal' && (
+        <div className="flex flex-col gap-5">
+          <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-5 text-center">
+            <h2 className="font-display text-xl text-[#E3B23C]">Rollene er delt ut</h2>
+            <p className="mt-1 text-sm text-[#9A92A8]">
+              {players.filter((p) => p.role_confirmed).length}/{players.length} har lest rollen sin
+            </p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {players.map((p) => (
+                <span key={p.id}
+                  className={`rounded-lg px-3 py-1.5 text-sm ${p.role_confirmed ? 'bg-[#6B8F5E]/25 text-[#6B8F5E]' : 'bg-[#352E47] text-[#9A92A8]'}`}>
+                  {p.role_confirmed ? '✓ ' : ''}{p.name}
+                </span>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={async () => {
+              setBusy(true)
+              await supabase.rpc('begin_works', { p_session_id: sessionId, p_host_id: hostId.current })
+              setBusy(false)
+            }}
+            disabled={busy || (players.length > 0 && !players.every((p) => p.role_confirmed))}
+            className="rounded-xl bg-[#E3B23C] py-3.5 font-medium text-[#1A1626] disabled:opacity-40"
+          >
+            {players.every((p) => p.role_confirmed) ? 'Start gjerningene' : 'Venter på at alle leser rollen…'}
+          </button>
+        </div>
+      )}
+
+      {session.phase !== 'lobby' && session.phase !== 'role_reveal' && (
         <div className="flex flex-col gap-5">
           <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-5">
             <div className="mb-3 flex items-center justify-between text-sm">
