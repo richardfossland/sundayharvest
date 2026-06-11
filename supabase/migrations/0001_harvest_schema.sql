@@ -118,7 +118,19 @@ create policy "players rw" on harvest.players for all using (true) with check (t
 drop policy if exists "events r" on harvest.events;
 create policy "events r" on harvest.events for select using (true);
 
--- Secret tables: NO direct anon access. Only the SECURITY DEFINER RPCs below.
+-- Base privileges for a NON-public schema: unlike `public`, Supabase does not
+-- auto-grant these, so PostgREST's anon/authenticated roles need them explicitly.
+-- We grant broadly first (RLS still gates rows), THEN revoke the secret tables
+-- below so the broad grant can't re-open them.
+grant usage on schema harvest to anon, authenticated, service_role;
+grant select, insert, update, delete on all tables in schema harvest to anon, authenticated, service_role;
+grant execute on all functions in schema harvest to anon, authenticated, service_role;
+alter default privileges in schema harvest grant select, insert, update, delete on tables to anon, authenticated, service_role;
+alter default privileges in schema harvest grant execute on functions to anon, authenticated, service_role;
+
+-- Secret tables: revoke direct anon/authenticated access (service_role keeps it
+-- for admin). Reachable only through the SECURITY DEFINER RPCs, which run as the
+-- definer and so bypass these revokes.
 revoke all on harvest.player_secrets from anon, authenticated;
 revoke all on harvest.player_roles   from anon, authenticated;
 revoke all on harvest.work_plays     from anon, authenticated;
