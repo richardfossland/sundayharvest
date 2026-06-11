@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sundayharvest",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-05-05",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [{ "pattern": "harvest.sundaysuite.app", "custom_domain": true }],
+  "observability": {
+    "enabled": true
+  }
+  // NEXT_PUBLIC_* are build-time inlined (set in .env.local before cf:build).
+  // No runtime Worker secret is needed: the game uses only the anon key, and
+  // all secrecy is enforced by SECURITY DEFINER RPCs in the `harvest` schema.
+}

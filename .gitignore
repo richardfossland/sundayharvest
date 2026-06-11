@@ -1,0 +1,31 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+
+# opennext / cloudflare
+/.open-next/
+.wrangler/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# debug
+npm-debug.log*
+
+# env
+.env*.local
+.env
+
+# vercel
+.vercel

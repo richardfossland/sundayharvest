@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --color-field:   #1A1626; /* night field — background */
+  --color-surface: #262035;
+  --color-border:  #352E47;
+  --color-gold:    #E3B23C; /* wheat gold — primary */
+  --color-sage:    #6B8F5E; /* fruit / faithful / success */
+  --color-blight:  #8B3A3A; /* weeds / betrayer / failure (sparingly) */
+  --color-text:    #F2EFE6;
+  --color-muted:   #9A92A8;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.animate-pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+
+/* Damascus flash — single bright wheat-gold sweep across the projector. */
+@keyframes damascus {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.animate-damascus { animation: damascus 2.6s ease-out forwards; }
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg); }
+}
+.animate-sway { animation: sway 3s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in, .animate-pulse-gold, .animate-damascus, .animate-sway {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
