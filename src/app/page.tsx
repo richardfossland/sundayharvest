@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { setIdentity, ensureHostId, bindHostSession } from '@/lib/identity'
 
@@ -12,13 +12,41 @@ function randomCode() {
   return c
 }
 
+/** Normalise a scanned/typed code to the 4-letter shape the lobby uses. */
+function normalizeCode(raw: string | null): string {
+  if (!raw) return ''
+  return raw.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4)
+}
+
 export default function Landing() {
+  // useSearchParams() requires a Suspense boundary in the App Router.
+  return (
+    <Suspense fallback={<LandingShell />}>
+      <LandingInner />
+    </Suspense>
+  )
+}
+
+function LandingInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const prefilledCode = normalizeCode(searchParams.get('code'))
   const [mode, setMode] = useState<'join' | 'host'>('join')
-  const [code, setCode] = useState('')
+  const [code, setCode] = useState(prefilledCode)
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const nameRef = useRef<HTMLInputElement>(null)
+
+  // Deep-link from the projector QR: ?code=XXXX prefills the code, forces the
+  // "join" tab, and jumps focus straight to the name field (the only thing the
+  // player still has to type). No DB/secret involved — purely the join form.
+  useEffect(() => {
+    if (!prefilledCode) return
+    setMode('join')
+    setCode(prefilledCode)
+    nameRef.current?.focus()
+  }, [prefilledCode])
 
   async function join() {
     setError('')
@@ -91,6 +119,7 @@ export default function Landing() {
               className="rounded-xl border border-[#352E47] bg-[#262035] px-4 py-3 text-center font-display text-2xl tracking-[0.3em] text-[#F2EFE6] placeholder:tracking-normal placeholder:text-base placeholder:text-[#9A92A8] focus:border-[#E3B23C] focus:outline-none"
             />
             <input
+              ref={nameRef}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Navnet ditt"
@@ -125,6 +154,20 @@ export default function Landing() {
         <p className="mt-10 text-center text-xs leading-relaxed text-[#9A92A8]">
           Ingen blir slått ut. Alle spiller hele veien. Du dømmer gjerninger — ikke hjerter.
         </p>
+      </div>
+    </main>
+  )
+}
+
+/** Minimal chrome shown while the search-param-reading client tree hydrates. */
+function LandingShell() {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-10">
+      <div className="text-center">
+        <div className="mb-2 inline-block animate-sway text-5xl" aria-hidden>🌾</div>
+        <h1 className="font-display text-4xl font-semibold tracking-tight text-[#E3B23C]">
+          SundayHarvest
+        </h1>
       </div>
     </main>
   )

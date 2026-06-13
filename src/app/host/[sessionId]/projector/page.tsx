@@ -6,6 +6,7 @@ import { Session, Player, GameEvent } from '@/types/game'
 import { TWO_WEED_WORKS } from '@/lib/config'
 import { WorkTrack, RejectDots } from '@/components/game/WorkTrack'
 import { workResults } from '@/components/game/PhaseBar'
+import { QRCode } from '@/components/QRCode'
 
 type VoteReveal = { approved: boolean; votes: { player_id: string; value: string }[] }
 type WorkReveal = { fruit: boolean; weeds: number; fruits: number }
@@ -46,13 +47,29 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   if (!session) return <Screen><span className="text-[#9A92A8]">Laster…</span></Screen>
 
   if (session.phase === 'lobby') {
+    // Deep-link the QR straight into the join form with the code prefilled, so
+    // players only have to type their name (see app/page.tsx ?code= handler).
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : 'https://harvest.sundaysuite.app'
+    const joinUrl = `${origin}/?code=${encodeURIComponent(session.code)}`
     return (
       <Screen>
-        <p className="text-3xl text-[#9A92A8]">Spillkode</p>
-        <p className="font-display text-[12rem] leading-none tracking-[0.1em] text-[#E3B23C]">{session.code}</p>
-        <p className="mt-8 text-2xl text-[#9A92A8]">{players.length} spillere · harvest.sundaysuite.app</p>
+        <div className="flex flex-wrap items-center justify-center gap-12">
+          <div>
+            <p className="text-3xl text-[#9A92A8]">Spillkode</p>
+            <p className="font-display text-[10rem] leading-none tracking-[0.1em] text-[#E3B23C]">{session.code}</p>
+            <p className="mt-6 text-2xl text-[#9A92A8]">harvest.sundaysuite.app</p>
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            <QRCode value={joinUrl} size={320} ec="M" title={`Skann for å bli med (kode ${session.code})`} />
+            <p className="text-xl text-[#9A92A8]">Skann med telefonen</p>
+          </div>
+        </div>
+        <p className="mt-10 text-2xl text-[#9A92A8]">{players.length} {players.length === 1 ? 'spiller' : 'spillere'} venter</p>
         <div className="mt-6 flex max-w-4xl flex-wrap justify-center gap-3">
-          {players.map((p) => <span key={p.id} className="rounded-xl bg-[#262035] px-5 py-2.5 text-2xl">{p.name}</span>)}
+          {players.map((p) => (
+            <span key={p.id} className="animate-fade-in rounded-xl bg-[#262035] px-5 py-2.5 text-2xl">{p.name}</span>
+          ))}
         </div>
       </Screen>
     )
