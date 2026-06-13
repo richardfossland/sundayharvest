@@ -1,0 +1,33 @@
+-- 0002 — harden public-table RLS (night security audit 2026-06-13).
+--
+-- 0001 left harvest.sessions / harvest.players as `for all using(true) with
+-- check(true)` plus broad anon/authenticated write grants. The session row holds
+-- the AUTHORITATIVE game state (phase, outcome, leader_seat, proposed_team, …),
+-- so any joined player could forge it directly via PostgREST — bypassing every
+-- host_id check in the SECURITY DEFINER RPCs:
+--   supabase.from('sessions').update({ phase:'ended', outcome:'faithful_win' })
+-- i.e. instant win, self-elect as leader each round, or skip voting.
+--
+-- The hidden-role tables (player_roles/player_secrets/votes/work_plays) were
+-- already revoked in 0001, so role secrecy is intact — this closes the separate
+-- game-INTEGRITY hole on the public tables.
+--
+-- Legitimate writes happen ONLY through the SECURITY DEFINER RPCs, which run as
+-- the function owner and are unaffected by these client grants. The client reads
+-- sessions/players directly and via Realtime postgres_changes, so SELECT stays
+-- open. (Note: the host_id-as-plaintext authorization weakness, audit #10, is a
+-- separate follow-up — host RPCs still trust an anon-readable host_id.)
+
+revoke insert, update, delete on harvest.sessions from anon, authenticated;
+revoke insert, update, delete on harvest.players  from anon, authenticated;
+
+-- Replace the read-write policies with read-only (service_role keeps full access
+-- for admin; the SECURITY DEFINER RPCs write as owner). Idempotent: drop both
+-- the old and new policy names before creating, so a re-apply is a no-op.
+drop policy if exists "sessions rw" on harvest.sessions;
+drop policy if exists "sessions read" on harvest.sessions;
+create policy "sessions read" on harvest.sessions for select using (true);
+
+drop policy if exists "players rw" on harvest.players;
+drop policy if exists "players read" on harvest.players;
+create policy "players read" on harvest.players for select using (true);
