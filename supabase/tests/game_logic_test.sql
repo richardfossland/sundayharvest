@@ -270,4 +270,34 @@ begin
   perform pg_temp.assert_text((select phase from sessions where id=sid),'work_vote','F: phase → vote');
 end $$;
 
+-- ============ Scenario G: 0002 hardening — session-write lockdown + create_session ============
+-- After 0002, anon/authenticated may NOT write sessions/players directly; the only
+-- session-creation path is the create_session() SECURITY DEFINER RPC.
+do $$
+declare r jsonb; sid uuid;
+begin
+  r := harvest.create_session('host-xyz');
+  perform pg_temp.assert_true((r->>'ok')::bool, 'G: create_session ok');
+  sid := (r->>'id')::uuid;
+  perform pg_temp.assert_true(sid is not null, 'G: create_session returns id');
+  perform pg_temp.assert_eq(char_length(r->>'code'), 4, 'G: code is 4 chars');
+  perform pg_temp.assert_true(exists(select 1 from sessions where id = sid), 'G: session row created');
+  perform pg_temp.assert_text((select phase from sessions where id = sid), 'lobby', 'G: new session in lobby');
+end $$;
+
+-- anon is blocked from a direct INSERT into sessions (the hole 0002 closes)…
+set role anon;
+do $$
+declare blocked bool := false;
+begin
+  begin
+    insert into harvest.sessions(code, host_id) values ('ZZZZ','anon-forge');
+  exception when insufficient_privilege then blocked := true;
+  end;
+  perform pg_temp.assert_true(blocked, 'G: anon direct sessions INSERT blocked');
+  -- …but anon CAN still create a session through the SECURITY DEFINER RPC.
+  perform pg_temp.assert_true((harvest.create_session('anon-host') ->> 'ok')::bool, 'G: anon create_session via RPC ok');
+end $$;
+reset role;
+
 select '✅ ALL GAME-LOGIC TESTS PASSED' as result;
