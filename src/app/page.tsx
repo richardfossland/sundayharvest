@@ -5,13 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { setIdentity, ensureHostId, bindHostSession } from '@/lib/identity'
 
-function randomCode() {
-  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // no I/O for legibility
-  let c = ''
-  for (let i = 0; i < 4; i++) c += alphabet[Math.floor(Math.random() * alphabet.length)]
-  return c
-}
-
 /** Normalise a scanned/typed code to the 4-letter shape the lobby uses. */
 function normalizeCode(raw: string | null): string {
   if (!raw) return ''
@@ -69,14 +62,12 @@ function LandingInner() {
     setBusy(true)
     const supabase = createClient()
     const hostId = ensureHostId()
-    const newCode = randomCode()
-    const { data, error } = await supabase
-      .from('sessions')
-      .insert({ code: newCode, host_id: hostId })
-      .select()
-      .single()
+    // Session creation goes through the create_session SECURITY DEFINER RPC:
+    // 0002 revokes direct anon INSERT on harvest.sessions (game-integrity lockdown).
+    const { data, error } = await supabase.rpc('create_session', { p_host_id: hostId })
     setBusy(false)
-    if (error || !data) return setError(error?.message ?? 'Kunne ikke opprette spill.')
+    if (error) return setError(error.message)
+    if (!data?.ok) return setError(data?.error ?? 'Kunne ikke opprette spill.')
     bindHostSession(data.id)
     router.push(`/host/${data.id}`)
   }
