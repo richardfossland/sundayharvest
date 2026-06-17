@@ -17,6 +17,45 @@
 -- sessions/players directly and via Realtime postgres_changes, so SELECT stays
 -- open. (Note: the host_id-as-plaintext authorization weakness, audit #10, is a
 -- separate follow-up — host RPCs still trust an anon-readable host_id.)
+--
+-- Player creation already went through join_session(); SESSION creation was the
+-- one remaining direct anon INSERT (Landing host()). Revoking INSERT below would
+-- break "opprett spill", so we add a create_session() SECURITY DEFINER RPC FIRST
+-- (generates a unique code server-side, returns the new id) and repoint the client.
+
+-- Host creates a session. SECURITY DEFINER so it survives the INSERT revoke below.
+create or replace function harvest.create_session(p_host_id text)
+returns jsonb language plpgsql security definer
+set search_path = harvest, public as $$
+declare
+  v_alphabet constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZ'; -- no I/O, matches client legibility
+  v_code text;
+  v_id uuid;
+  v_try int := 0;
+begin
+  if char_length(coalesce(trim(p_host_id), '')) = 0 then
+    return jsonb_build_object('ok', false, 'error', 'Mangler vert-id');
+  end if;
+  loop
+    v_try := v_try + 1;
+    v_code := '';
+    for _ in 1..4 loop
+      v_code := v_code || substr(v_alphabet, 1 + floor(random() * char_length(v_alphabet))::int, 1);
+    end loop;
+    begin
+      insert into harvest.sessions (code, host_id) values (v_code, trim(p_host_id))
+        returning id into v_id;
+      return jsonb_build_object('ok', true, 'id', v_id, 'code', v_code);
+    exception when unique_violation then
+      if v_try >= 20 then
+        return jsonb_build_object('ok', false, 'error', 'Kunne ikke generere unik kode');
+      end if;
+      -- rare 4-char collision: loop and try a fresh code
+    end;
+  end loop;
+end; $$;
+
+grant execute on function harvest.create_session(text) to anon, authenticated, service_role;
 
 revoke insert, update, delete on harvest.sessions from anon, authenticated;
 revoke insert, update, delete on harvest.players  from anon, authenticated;
