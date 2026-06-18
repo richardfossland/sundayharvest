@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { setIdentity, ensureHostId, bindHostSession } from '@/lib/identity'
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { ErrorText } from '@/components/ui/ErrorText'
 import { cn } from '@/lib/cn'
+import { hostStrings } from '@/lib/locale/host'
 
 /** Normalise a scanned/typed code to the 4-letter shape the lobby uses. */
 function normalizeCode(raw: string | null): string {
@@ -142,6 +144,12 @@ function LandingInner() {
 
         <p className="mt-10 text-center text-xs leading-relaxed text-muted">
           Ingen blir slått ut. Alle spiller hele veien. Du dømmer gjerninger — ikke hjerter.
+        </p>
+
+        <p className="mt-4 text-center">
+          <Link href="/host" className="text-xs text-[#9A92A8] underline-offset-2 hover:text-[#E3B23C] hover:underline">
+            {hostStrings.hostLink}
+          </Link>
         </p>
       </div>
     </main>
