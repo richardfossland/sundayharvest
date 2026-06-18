@@ -300,4 +300,52 @@ begin
 end $$;
 reset role;
 
+-- ============ Scenario H: 0003 — Sunday Account host ownership ("Mine økter") ============
+-- create_owned_session stamps host_user_id; delete_owned_session is owner-gated
+-- (refuses anonymous + other owners, deletes own with FK cascade). Players/joiners
+-- stay code-based; this is purely additive for the signed-in vert.
+do $$
+declare
+  me uuid := '11111111-1111-1111-1111-111111111111';
+  other uuid := '22222222-2222-2222-2222-222222222222';
+  r jsonb; mine uuid; anon_sid uuid; pid uuid; del jsonb;
+begin
+  -- owner is stamped on create.
+  r := harvest.create_owned_session('host-h', me);
+  perform pg_temp.assert_true((r->>'ok')::bool, 'H: create_owned_session ok');
+  mine := (r->>'id')::uuid;
+  perform pg_temp.assert_true(
+    (select host_user_id from sessions where id = mine) = me, 'H: owner stamped');
+
+  -- an anonymous (create_session) game has NULL owner.
+  anon_sid := (harvest.create_session('host-anon') ->> 'id')::uuid;
+  perform pg_temp.assert_true(
+    (select host_user_id from sessions where id = anon_sid) is null, 'H: anon owner null');
+
+  -- a child row to prove FK cascade on delete.
+  insert into harvest.players(session_id, name, seat) values (mine, 'Kari', 0) returning id into pid;
+  insert into harvest.player_secrets(player_id, secret) values (pid, 'sec-h');
+
+  -- another host cannot delete my game.
+  del := harvest.delete_owned_session(mine, other);
+  perform pg_temp.assert_true(not (del->>'deleted')::bool, 'H: other host cannot delete');
+  perform pg_temp.assert_text(del->>'reason', 'not_owner', 'H: refusal reason not_owner');
+  perform pg_temp.assert_true(exists(select 1 from sessions where id = mine), 'H: my game still there');
+
+  -- nobody can delete an anonymous game via the dashboard RPC.
+  perform pg_temp.assert_true(
+    not (harvest.delete_owned_session(anon_sid, me) ->> 'deleted')::bool, 'H: anon game undeletable by owner-RPC');
+
+  -- missing game → not_found.
+  perform pg_temp.assert_text(
+    harvest.delete_owned_session(gen_random_uuid(), me) ->> 'reason', 'not_found', 'H: missing → not_found');
+
+  -- the owner deletes their own game; child rows cascade.
+  del := harvest.delete_owned_session(mine, me);
+  perform pg_temp.assert_true((del->>'deleted')::bool, 'H: owner deletes own game');
+  perform pg_temp.assert_true(not exists(select 1 from sessions where id = mine), 'H: game row gone');
+  perform pg_temp.assert_eq(
+    (select count(*)::int from harvest.players where id = pid), 0, 'H: child player cascaded');
+end $$;
+
 select '✅ ALL GAME-LOGIC TESTS PASSED' as result;

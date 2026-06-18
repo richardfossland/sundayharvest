@@ -10,6 +10,12 @@ import { createBrowserClient } from '@supabase/ssr'
  * no user auth: public tables use open RLS, while ALL secrets live in locked
  * tables reachable only through SECURITY DEFINER RPCs keyed on a per-player
  * secret (see supabase/migrations).
+ *
+ * This client is deliberately SESSION-LESS (`persistSession:false`): the host
+ * SSO login (Sunday Account) lives on a SEPARATE issuer project and writes its
+ * own `sb-*` cookie via `auth-browser.ts`. Keeping the DATA client from
+ * persisting a session means it never writes a competing `sb-*` cookie that
+ * would clobber the SSO login.
  */
 export function createClient() {
   return createBrowserClient(
@@ -17,6 +23,7 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       db: { schema: 'harvest' },
+      auth: { persistSession: false, autoRefreshToken: false },
     }
   )
 }
