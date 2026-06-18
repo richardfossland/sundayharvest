@@ -111,7 +111,7 @@ export default function PlayPage({ params }: { params: Promise<{ sessionId: stri
       )}
 
       {conversion && (
-        <div className="border-b border-[#E3B23C]/40 bg-[#E3B23C]/15 px-4 py-3 text-center text-sm text-[#E3B23C]">
+        <div className="border-b border-gold/40 bg-gold/15 px-4 py-3 text-center text-sm text-gold">
           ⚡ {conversion.name} har omvendt seg på veien til Damaskus. Hen er nå trofast.
         </div>
       )}
@@ -213,12 +213,12 @@ export default function PlayPage({ params }: { params: Promise<{ sessionId: stri
 // ── Phase bodies ─────────────────────────────────────────────────────────────
 
 function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="flex min-h-screen items-center justify-center text-[#9A92A8]">{children}</div>
+  return <div className="flex min-h-screen items-center justify-center text-muted">{children}</div>
 }
 
 function Waiting({ children }: { children: React.ReactNode }) {
   return (
-    <div className="animate-fade-in rounded-2xl border border-[#352E47] bg-[#262035] p-8 text-center text-[#9A92A8]">
+    <div className="animate-fade-in rounded-2xl border border-border bg-surface p-8 text-center text-muted">
       {children}
     </div>
   )
@@ -227,11 +227,11 @@ function Waiting({ children }: { children: React.ReactNode }) {
 function Lobby({ players }: { players: Player[] }) {
   return (
     <div className="animate-fade-in flex flex-col gap-4">
-      <h2 className="font-display text-2xl text-[#E3B23C]">I lobbyen</h2>
-      <p className="text-sm text-[#9A92A8]">Venter på at verten starter spillet…</p>
+      <h2 className="font-display text-2xl text-gold">I lobbyen</h2>
+      <p className="text-sm text-muted">Venter på at verten starter spillet…</p>
       <div className="flex flex-wrap gap-2">
         {players.map((p) => (
-          <span key={p.id} className="rounded-lg bg-[#352E47] px-3 py-1.5 text-sm">{p.name}</span>
+          <span key={p.id} className="rounded-lg bg-border px-3 py-1.5 text-sm">{p.name}</span>
         ))}
       </div>
     </div>
@@ -246,7 +246,7 @@ function RoleReveal({ role, confirmed, onConfirm }: { role: MyRole | null; confi
       {confirmed ? (
         <Waiting>Du har lest rollen din. Venter på de andre…</Waiting>
       ) : (
-        <button onClick={onConfirm} className="rounded-xl bg-[#6B8F5E] py-3 font-medium text-[#1A1626]">
+        <button onClick={onConfirm} className="rounded-xl bg-sage py-3 font-medium text-ink">
           Jeg har lest rollen min
         </button>
       )}
@@ -260,22 +260,22 @@ function ConvertButton({ onConvert, busy }: { onConvert: () => void; busy: boole
     return (
       <button
         onClick={() => setConfirm(true)}
-        className="w-full rounded-xl border border-[#E3B23C]/50 bg-[#E3B23C]/10 py-3 text-sm font-medium text-[#E3B23C]"
+        className="w-full rounded-xl border border-gold/50 bg-gold/10 py-3 text-sm font-medium text-gold"
       >
         ⚡ Omvend deg
       </button>
     )
   }
   return (
-    <div className="rounded-xl border border-[#E3B23C]/50 bg-[#1A1626] p-4">
-      <p className="text-sm text-[#F2EFE6]">
+    <div className="rounded-xl border border-gold/50 bg-field p-4">
+      <p className="text-sm text-text">
         Dette kan ikke angres. Du blir trofast — men blindet. Du mister synet på de andre forræderne.
       </p>
       <div className="mt-3 flex gap-2">
-        <button onClick={() => setConfirm(false)} className="flex-1 rounded-lg border border-[#352E47] py-2 text-sm text-[#9A92A8]">
+        <button onClick={() => setConfirm(false)} className="flex-1 rounded-lg border border-border py-2 text-sm text-muted">
           Avbryt
         </button>
-        <button onClick={onConvert} disabled={busy} className="flex-1 rounded-lg bg-[#E3B23C] py-2 text-sm font-medium text-[#1A1626] disabled:opacity-50">
+        <button onClick={onConvert} disabled={busy} className="flex-1 rounded-lg bg-gold py-2 text-sm font-medium text-ink disabled:opacity-50">
           Omvend deg
         </button>
       </div>
@@ -302,8 +302,8 @@ function Proposal({
       {isLeader ? (
         <>
           <div>
-            <h2 className="font-display text-2xl text-[#E3B23C]">Du er Eldste</h2>
-            <p className="text-sm text-[#9A92A8]">Velg {need} til å gå ut på gjerningen.</p>
+            <h2 className="font-display text-2xl text-gold">Du er Eldste</h2>
+            <p className="text-sm text-muted">Velg {need} til å gå ut på gjerningen.</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {players.map((p) => (
@@ -312,8 +312,8 @@ function Proposal({
                 onClick={() => toggle(p.id)}
                 className={`rounded-xl border-2 px-3 py-3 text-sm transition-colors ${
                   picked.includes(p.id)
-                    ? 'border-[#6B8F5E] bg-[#6B8F5E]/20 text-[#F2EFE6]'
-                    : 'border-[#352E47] bg-[#262035] text-[#9A92A8]'
+                    ? 'border-sage bg-sage/20 text-text'
+                    : 'border-border bg-surface text-muted'
                 }`}
               >
                 {p.name}
@@ -323,14 +323,14 @@ function Proposal({
           <button
             onClick={() => onPropose(picked)}
             disabled={picked.length !== need || busy}
-            className="rounded-xl bg-[#E3B23C] py-3 font-medium text-[#1A1626] disabled:opacity-40"
+            className="rounded-xl bg-gold py-3 font-medium text-ink disabled:opacity-40"
           >
             Send ut laget ({picked.length}/{need})
           </button>
         </>
       ) : (
         <Waiting>
-          <span className="text-[#F2EFE6]">{leaderName}</span> velger hvem som skal gå ut…
+          <span className="text-text">{leaderName}</span> velger hvem som skal gå ut…
         </Waiting>
       )}
       {canConvert && <ConvertButton onConvert={onConvert} busy={busy} />}
@@ -351,14 +351,14 @@ function VotePhase({
   if (voteReveal) {
     return (
       <div className="animate-fade-in flex flex-col gap-4">
-        <h2 className="text-center font-display text-2xl text-[#E3B23C]">
+        <h2 className="text-center font-display text-2xl text-gold">
           {voteReveal.approved ? 'GODKJENT' : 'AVVIST'}
         </h2>
         <div className="flex flex-col gap-1.5">
           {voteReveal.votes.map((v) => (
-            <div key={v.player_id} className="flex items-center justify-between rounded-lg bg-[#262035] px-3 py-2 text-sm">
-              <span>{nameOf(v.player_id)}{v.weight === 2 && <span className="ml-1 text-xs text-[#E3B23C]">×2</span>}</span>
-              <span className={v.value === 'approve' ? 'text-[#6B8F5E]' : 'text-[#cf8a8a]'}>
+            <div key={v.player_id} className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm">
+              <span>{nameOf(v.player_id)}{v.weight === 2 && <span className="ml-1 text-xs text-gold">×2</span>}</span>
+              <span className={v.value === 'approve' ? 'text-sage' : 'text-blight-text'}>
                 {v.value === 'approve' ? '✓ Godkjenn' : '✗ Avvis'}
               </span>
             </div>
@@ -371,10 +371,10 @@ function VotePhase({
   return (
     <div className="animate-fade-in flex flex-col gap-4">
       <div>
-        <h2 className="font-display text-2xl text-[#E3B23C]">Stem over laget</h2>
+        <h2 className="font-display text-2xl text-gold">Stem over laget</h2>
         <div className="mt-2 flex flex-wrap gap-2">
           {session.proposed_team.map((id) => (
-            <span key={id} className="rounded-lg bg-[#352E47] px-3 py-1.5 text-sm">{nameOf(id)}</span>
+            <span key={id} className="rounded-lg bg-border px-3 py-1.5 text-sm">{nameOf(id)}</span>
           ))}
         </div>
       </div>
@@ -383,11 +383,11 @@ function VotePhase({
       ) : (
         <div className="flex gap-3">
           <button onClick={() => { onVote('approve'); setVoted(true) }} disabled={busy}
-            className="flex-1 rounded-xl bg-[#6B8F5E] py-4 font-medium text-[#1A1626] disabled:opacity-50">
+            className="flex-1 rounded-xl bg-sage py-4 font-medium text-ink disabled:opacity-50">
             Godkjenn
           </button>
           <button onClick={() => { onVote('reject'); setVoted(true) }} disabled={busy}
-            className="flex-1 rounded-xl bg-[#8B3A3A] py-4 font-medium text-[#F2EFE6] disabled:opacity-50">
+            className="flex-1 rounded-xl bg-blight py-4 font-medium text-text disabled:opacity-50">
             Avvis
           </button>
         </div>
@@ -411,8 +411,8 @@ function Execution({
     return (
       <div className="animate-fade-in flex flex-col items-center gap-3 py-6 text-center">
         <div className="text-5xl" aria-hidden>{workReveal.fruit ? '🌾' : '🥀'}</div>
-        <p className="text-sm text-[#9A92A8]">{workReveal.fruits} frukt · {workReveal.weeds} ugress</p>
-        <h2 className="font-display text-2xl text-[#E3B23C]">
+        <p className="text-sm text-muted">{workReveal.fruits} frukt · {workReveal.weeds} ugress</p>
+        <h2 className="font-display text-2xl text-gold">
           {workReveal.fruit ? 'Gjerningen bar frukt' : 'Gjerningen visnet blant ugresset'}
         </h2>
       </div>
@@ -424,23 +424,23 @@ function Execution({
 
   return (
     <div className="animate-fade-in flex flex-col gap-4">
-      <h2 className="font-display text-2xl text-[#E3B23C]">Spill kortet ditt</h2>
+      <h2 className="font-display text-2xl text-gold">Spill kortet ditt</h2>
       <div className="flex gap-3">
         <button onClick={() => { onCard('fruit'); setPlayed(true) }} disabled={busy}
-          className="flex-1 rounded-2xl border-2 border-[#6B8F5E] bg-[#6B8F5E]/20 py-8 text-center disabled:opacity-50">
+          className="flex-1 rounded-2xl border-2 border-sage bg-sage/20 py-8 text-center disabled:opacity-50">
           <div className="text-4xl" aria-hidden>🌾</div>
-          <div className="mt-2 font-medium text-[#F2EFE6]">Frukt</div>
+          <div className="mt-2 font-medium text-text">Frukt</div>
         </button>
         <button
           onClick={() => { if (!faithful) { onCard('weed'); setPlayed(true) } }}
           disabled={faithful || busy}
           className={`flex-1 rounded-2xl border-2 py-8 text-center ${
-            faithful ? 'border-[#352E47] bg-[#262035] opacity-40' : 'border-[#8B3A3A] bg-[#8B3A3A]/20'
+            faithful ? 'border-border bg-surface opacity-40' : 'border-blight bg-blight/20'
           }`}
         >
           <div className="text-4xl" aria-hidden>🥀</div>
-          <div className="mt-2 font-medium text-[#F2EFE6]">Ugress</div>
-          {faithful && <div className="mt-1 text-xs text-[#9A92A8]">Du er trofast</div>}
+          <div className="mt-2 font-medium text-text">Ugress</div>
+          {faithful && <div className="mt-1 text-xs text-muted">Du er trofast</div>}
         </button>
       </div>
     </div>
@@ -456,7 +456,7 @@ function Judas({
   if (!isJudas) {
     return (
       <Waiting>
-        <p className="text-[#F2EFE6]">Flokken fullførte tre gjerninger…</p>
+        <p className="text-text">Flokken fullførte tre gjerninger…</p>
         <p className="mt-1">men Judas reiser seg.</p>
       </Waiting>
     )
@@ -464,21 +464,21 @@ function Judas({
   return (
     <div className="animate-fade-in flex flex-col gap-4">
       <div>
-        <h2 className="font-display text-2xl text-[#E3B23C]">Ett siste forsøk</h2>
-        <p className="text-sm text-[#9A92A8]">Pek ut den du tror er Profeten.</p>
+        <h2 className="font-display text-2xl text-gold">Ett siste forsøk</h2>
+        <p className="text-sm text-muted">Pek ut den du tror er Profeten.</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {players.filter((p) => p.id !== meId).map((p) => (
           <button key={p.id} onClick={() => setTarget(p.id)}
             className={`rounded-xl border-2 px-3 py-3 text-sm ${
-              target === p.id ? 'border-[#8B3A3A] bg-[#8B3A3A]/25 text-[#F2EFE6]' : 'border-[#352E47] bg-[#262035] text-[#9A92A8]'
+              target === p.id ? 'border-blight bg-blight/25 text-text' : 'border-border bg-surface text-muted'
             }`}>
             {p.name}
           </button>
         ))}
       </div>
       <button onClick={() => target && onStrike(target)} disabled={!target || busy}
-        className="rounded-xl bg-[#8B3A3A] py-3 font-medium text-[#F2EFE6] disabled:opacity-40">
+        className="rounded-xl bg-blight py-3 font-medium text-text disabled:opacity-40">
         Pek ut Profeten
       </button>
     </div>

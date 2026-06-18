@@ -1,9 +1,18 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces } from 'next/font/google'
+import { Playfair_Display, Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces' })
+// Suite brand fonts: Playfair Display (display/wordmark) + Hanken Grotesk (body).
+const display = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-display',
+})
+const body = Hanken_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
+})
 
 export const metadata: Metadata = {
   title: 'SundayHarvest',
@@ -19,8 +28,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="no" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="bg-[#1A1626] text-[#F2EFE6] min-h-screen font-sans antialiased">
+    <html lang="no" className={`${display.variable} ${body.variable}`}>
+      <body className="min-h-screen bg-field font-sans text-text antialiased">
         {children}
       </body>
     </html>

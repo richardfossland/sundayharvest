@@ -16,15 +16,15 @@ export function workResults(s: Session): (boolean | undefined)[] {
 export function PhaseBar({ session, leaderName }: { session: Session; leaderName?: string }) {
   const twoWeed = (TWO_WEED_WORKS[session.player_count] ?? [])[0]
   return (
-    <div className="border-b border-[#352E47] bg-[#262035]/60 px-4 py-3">
+    <div className="border-b border-border bg-surface/60 px-4 py-3">
       <div className="mx-auto flex max-w-md flex-col gap-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-display text-[#E3B23C]">
+          <span className="font-display text-gold">
             Gjerning {session.current_work}/5
           </span>
           {leaderName && (
-            <span className="text-[#9A92A8]">
-              Eldste: <span className="text-[#F2EFE6]">{leaderName}</span>
+            <span className="text-muted">
+              Eldste: <span className="text-text">{leaderName}</span>
             </span>
           )}
         </div>
@@ -33,7 +33,7 @@ export function PhaseBar({ session, leaderName }: { session: Session; leaderName
           current={session.current_work}
           twoWeedWork={twoWeed}
         />
-        <div className="flex items-center justify-between text-xs text-[#9A92A8]">
+        <div className="flex items-center justify-between text-xs text-muted">
           <span>Avvisninger</span>
           <RejectDots count={session.reject_count} />
         </div>

@@ -26,10 +26,10 @@ export function WorkTrack({
             className={cn(
               'relative flex items-center justify-center rounded-xl border-2 transition-colors',
               large ? 'h-20 w-20 text-3xl' : 'h-11 w-11 text-lg',
-              r === true && 'border-[#6B8F5E] bg-[#6B8F5E]/25',
-              r === false && 'border-[#8B3A3A] bg-[#8B3A3A]/25',
-              r === undefined && 'border-[#352E47] bg-[#262035]',
-              isCurrent && r === undefined && 'border-[#E3B23C] animate-pulse-gold'
+              r === true && 'border-sage bg-sage/25',
+              r === false && 'border-blight bg-blight/25',
+              r === undefined && 'border-border bg-surface',
+              isCurrent && r === undefined && 'border-gold animate-pulse-gold'
             )}
             title={isTwoWeed ? 'Krever to ugress for å feile' : undefined}
           >
@@ -37,7 +37,7 @@ export function WorkTrack({
             {isTwoWeed && (
               <span
                 className={cn(
-                  'absolute -top-1 -right-1 rounded-full bg-[#352E47] px-1 text-[#9A92A8]',
+                  'absolute -top-1 -right-1 rounded-full bg-border px-1 text-muted',
                   large ? 'text-xs' : 'text-[9px]'
                 )}
               >
@@ -61,7 +61,7 @@ export function RejectDots({ count, large = false }: { count: number; large?: bo
           className={cn(
             'rounded-full transition-colors',
             large ? 'h-3 w-3' : 'h-2 w-2',
-            i < count ? 'bg-[#8B3A3A]' : 'bg-[#352E47]'
+            i < count ? 'bg-blight' : 'bg-border'
           )}
         />
       ))}
