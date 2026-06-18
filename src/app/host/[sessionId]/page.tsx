@@ -98,41 +98,41 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
     setBusy(false)
   }
 
-  if (!session) return <div className="p-10 text-center text-[#9A92A8]">Laster…</div>
+  if (!session) return <div className="p-10 text-center text-muted">Laster…</div>
 
   return (
     <main className="mx-auto max-w-lg px-5 py-8">
       <header className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl text-[#E3B23C]">SundayHarvest — vert</h1>
+        <h1 className="font-display text-2xl text-gold">SundayHarvest — vert</h1>
         <Link href={`/host/${sessionId}/projector`} target="_blank"
-          className="rounded-lg border border-[#352E47] px-3 py-1.5 text-sm text-[#9A92A8]">
+          className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted">
           Storskjerm ↗
         </Link>
       </header>
 
       {session.phase === 'lobby' && (
         <div className="flex flex-col gap-5">
-          <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-5 text-center">
-            <p className="text-xs uppercase tracking-wide text-[#9A92A8]">Spillkode</p>
-            <p className="font-display text-5xl tracking-[0.2em] text-[#E3B23C]">{session.code}</p>
+          <div className="rounded-2xl border border-border bg-surface p-5 text-center">
+            <p className="text-xs uppercase tracking-wide text-muted">Spillkode</p>
+            <p className="font-display text-5xl tracking-[0.2em] text-gold">{session.code}</p>
           </div>
 
           <div>
-            <p className="mb-2 text-sm text-[#9A92A8]">{n} spillere</p>
+            <p className="mb-2 text-sm text-muted">{n} spillere</p>
             <div className="flex flex-wrap gap-2">
               {players.map((p) => (
-                <span key={p.id} className="rounded-lg bg-[#352E47] px-3 py-1.5 text-sm">
-                  {p.name}{!p.is_online && <span className="ml-1 text-[#9A92A8]">·</span>}
+                <span key={p.id} className="rounded-lg bg-border px-3 py-1.5 text-sm">
+                  {p.name}{!p.is_online && <span className="ml-1 text-muted">·</span>}
                 </span>
               ))}
-              {n === 0 && <span className="text-sm text-[#9A92A8]">Venter på spillere…</span>}
+              {n === 0 && <span className="text-sm text-muted">Venter på spillere…</span>}
             </div>
           </div>
 
           <RolePicker toggles={toggles} setToggles={setToggles} n={n} deck={deck} legal={legal} />
 
           <button onClick={startGame} disabled={!legal || busy}
-            className="rounded-xl bg-[#E3B23C] py-3.5 font-medium text-[#1A1626] disabled:opacity-40">
+            className="rounded-xl bg-gold py-3.5 font-medium text-ink disabled:opacity-40">
             {n < MIN_PLAYERS ? `Trenger minst ${MIN_PLAYERS} spillere`
               : n > MAX_PLAYERS ? `Maks ${MAX_PLAYERS} spillere`
               : busy ? '…' : `Start spillet (${n} spillere)`}
@@ -142,15 +142,15 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
 
       {session.phase === 'role_reveal' && (
         <div className="flex flex-col gap-5">
-          <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-5 text-center">
-            <h2 className="font-display text-xl text-[#E3B23C]">Rollene er delt ut</h2>
-            <p className="mt-1 text-sm text-[#9A92A8]">
+          <div className="rounded-2xl border border-border bg-surface p-5 text-center">
+            <h2 className="font-display text-xl text-gold">Rollene er delt ut</h2>
+            <p className="mt-1 text-sm text-muted">
               {players.filter((p) => p.role_confirmed).length}/{players.length} har lest rollen sin
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {players.map((p) => (
                 <span key={p.id}
-                  className={`rounded-lg px-3 py-1.5 text-sm ${p.role_confirmed ? 'bg-[#6B8F5E]/25 text-[#6B8F5E]' : 'bg-[#352E47] text-[#9A92A8]'}`}>
+                  className={`rounded-lg px-3 py-1.5 text-sm ${p.role_confirmed ? 'bg-sage/25 text-sage' : 'bg-border text-muted'}`}>
                   {p.role_confirmed ? '✓ ' : ''}{p.name}
                 </span>
               ))}
@@ -163,7 +163,7 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
               setBusy(false)
             }}
             disabled={busy || (players.length > 0 && !players.every((p) => p.role_confirmed))}
-            className="rounded-xl bg-[#E3B23C] py-3.5 font-medium text-[#1A1626] disabled:opacity-40"
+            className="rounded-xl bg-gold py-3.5 font-medium text-ink disabled:opacity-40"
           >
             {players.every((p) => p.role_confirmed) ? 'Start gjerningene' : 'Venter på at alle leser rollen…'}
           </button>
@@ -172,15 +172,15 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
 
       {session.phase !== 'lobby' && session.phase !== 'role_reveal' && (
         <div className="flex flex-col gap-5">
-          <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-5">
+          <div className="rounded-2xl border border-border bg-surface p-5">
             <div className="mb-3 flex items-center justify-between text-sm">
-              <span className="font-display text-[#E3B23C]">Gjerning {session.current_work}/5</span>
+              <span className="font-display text-gold">Gjerning {session.current_work}/5</span>
               <PhaseLabel phase={session.phase} />
             </div>
             <WorkTrack results={workResults(session)} current={session.current_work} />
-            <div className="mt-4 flex items-center justify-between text-xs text-[#9A92A8]">
+            <div className="mt-4 flex items-center justify-between text-xs text-muted">
               <span>
-                Eldste: <span className="text-[#F2EFE6]">
+                Eldste: <span className="text-text">
                   {players.find((p) => p.seat === session.leader_seat)?.name ?? '—'}
                 </span>
               </span>
@@ -190,7 +190,7 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
 
           {(session.phase === 'work_vote' || session.phase === 'work_execution') && (
             <button onClick={forceResolve} disabled={busy}
-              className="rounded-xl border border-[#352E47] bg-[#262035] py-3 text-sm text-[#9A92A8] disabled:opacity-50">
+              className="rounded-xl border border-border bg-surface py-3 text-sm text-muted disabled:opacity-50">
               Tving fram resultat (manglende stemmer = avvis · manglende kort = frukt)
             </button>
           )}
@@ -210,8 +210,8 @@ function RolePicker({
   const t = (k: keyof DeckToggles) => () => setToggles({ ...toggles, [k]: !toggles[k] })
   const counts = deck.reduce<Record<string, number>>((acc, r) => ((acc[r] = (acc[r] ?? 0) + 1), acc), {})
   return (
-    <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-4">
-      <p className="mb-3 text-xs uppercase tracking-wide text-[#9A92A8]">Sett sammen kortstokken</p>
+    <div className="rounded-2xl border border-border bg-surface p-4">
+      <p className="mb-3 text-xs uppercase tracking-wide text-muted">Sett sammen kortstokken</p>
       <div className="flex flex-col gap-2">
         <Toggle label="Vekteren + Den falske profeten" hint="Parvis — begge eller ingen" on={toggles.useShepherd} onClick={t('useShepherd')} />
         <Toggle label="Slangen" hint="Skjult for Profeten" on={toggles.useSerpent} onClick={t('useSerpent')} />
@@ -219,13 +219,13 @@ function RolePicker({
         <Toggle label="Barnabas" hint="Dobbel stemme — men blir kjent som trofast" on={toggles.useBarnabas} onClick={t('useBarnabas')} />
       </div>
       {legal && (
-        <div className="mt-4 border-t border-[#352E47] pt-3">
-          <p className="mb-1 text-xs text-[#9A92A8]">
+        <div className="mt-4 border-t border-border pt-3">
+          <p className="mb-1 text-xs text-muted">
             Kortstokk for {n}: {BETRAYER_COUNT[n]} forrædere
           </p>
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(counts).map(([r, c]) => (
-              <span key={r} className="rounded bg-[#1A1626] px-2 py-1 text-xs text-[#F2EFE6]">
+              <span key={r} className="rounded bg-field px-2 py-1 text-xs text-text">
                 {ROLES[r as keyof typeof ROLES].label}{c > 1 ? ` ×${c}` : ''}
               </span>
             ))}
@@ -238,13 +238,13 @@ function RolePicker({
 
 function Toggle({ label, hint, on, onClick }: { label: string; hint: string; on: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center justify-between rounded-xl border border-[#352E47] bg-[#1A1626] px-3 py-2.5 text-left">
+    <button onClick={onClick} className="flex items-center justify-between rounded-xl border border-border bg-field px-3 py-2.5 text-left">
       <span>
-        <span className="block text-sm text-[#F2EFE6]">{label}</span>
-        <span className="block text-xs text-[#9A92A8]">{hint}</span>
+        <span className="block text-sm text-text">{label}</span>
+        <span className="block text-xs text-muted">{hint}</span>
       </span>
-      <span className={`ml-3 h-6 w-11 flex-shrink-0 rounded-full p-0.5 transition-colors ${on ? 'bg-[#6B8F5E]' : 'bg-[#352E47]'}`}>
-        <span className={`block h-5 w-5 rounded-full bg-[#F2EFE6] transition-transform ${on ? 'translate-x-5' : ''}`} />
+      <span className={`ml-3 h-6 w-11 flex-shrink-0 rounded-full p-0.5 transition-colors ${on ? 'bg-sage' : 'bg-border'}`}>
+        <span className={`block h-5 w-5 rounded-full bg-text transition-transform ${on ? 'translate-x-5' : ''}`} />
       </span>
     </button>
   )
@@ -255,7 +255,7 @@ function PhaseLabel({ phase }: { phase: string }) {
     role_reveal: 'Rolleutdeling', work_proposal: 'Forslag', work_vote: 'Avstemning',
     work_execution: 'Gjerning pågår', judas_phase: 'Judas reiser seg', ended: 'Slutt',
   }
-  return <span className="text-[#9A92A8]">{map[phase] ?? phase}</span>
+  return <span className="text-muted">{map[phase] ?? phase}</span>
 }
 
 function EventFeed({ events }: { events: GameEvent[] }) {
@@ -268,9 +268,9 @@ function EventFeed({ events }: { events: GameEvent[] }) {
   }
   if (!events.length) return null
   return (
-    <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-4">
-      <p className="mb-2 text-xs uppercase tracking-wide text-[#9A92A8]">Hendelser</p>
-      <div className="flex flex-col gap-1.5 text-sm text-[#F2EFE6]">
+    <div className="rounded-2xl border border-border bg-surface p-4">
+      <p className="mb-2 text-xs uppercase tracking-wide text-muted">Hendelser</p>
+      <div className="flex flex-col gap-1.5 text-sm text-text">
         {events.map((e) => <div key={e.id}>{line(e)}</div>)}
       </div>
     </div>

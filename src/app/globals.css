@@ -1,57 +1,129 @@
 @import "tailwindcss";
 
-:root {
-  --color-field:   #1A1626; /* night field — background */
-  --color-surface: #262035;
-  --color-border:  #352E47;
-  --color-gold:    #E3B23C; /* wheat gold — primary */
-  --color-sage:    #6B8F5E; /* fruit / faithful / success */
-  --color-blight:  #8B3A3A; /* weeds / betrayer / failure (sparingly) */
-  --color-text:    #F2EFE6;
-  --color-muted:   #9A92A8;
-}
+/* SundayHarvest — design foundation.
+   Sunday Suite brand: gold #EBB84B · ink #14171E · paper #FAF7F0, with
+   Playfair Display (display) + Hanken Grotesk (body) injected by next/font in
+   layout.tsx. This app keeps its own "night field" identity — a deep aubergine
+   ground where the wheat and the weeds grow together until the harvest — while
+   harmonizing the gold accent, fonts, and interaction states with the suite. */
 
 @theme inline {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-fraunces), Georgia, serif;
+  /* Fonts (suite brand). */
+  --font-sans: var(--font-body), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
+
+  /* Brand + app palette — exposed as Tailwind colour utilities
+     (bg-gold, text-gold, border-border, bg-surface, …). */
+  --color-field: #1a1626; /* night field — background */
+  --color-surface: #262035;
+  --color-surface-2: #2f2842;
+  --color-border: #352e47;
+  --color-gold: #ebb84b; /* wheat gold — suite primary */
+  --color-gold-light: #f2d58a;
+  --color-gold-deep: #d4a23a;
+  --color-sage: #6b8f5e; /* fruit / faithful / success */
+  --color-blight: #8b3a3a; /* weeds / betrayer / failure (sparingly) */
+  --color-blight-text: #d49a9a; /* readable blight on the dark ground (AA) */
+  --color-ink: #14171e; /* suite ink — text on gold */
+  --color-paper: #faf7f0; /* suite paper */
+  --color-text: #f2efe6;
+  --color-muted: #9a92a8;
 }
 
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+* {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
 
 @keyframes pulse-gold {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
-.animate-pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
 
 /* Damascus flash — single bright wheat-gold sweep across the projector. */
 @keyframes damascus {
-  0%   { opacity: 0; }
-  12%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-.animate-damascus { animation: damascus 2.6s ease-out forwards; }
-
-@keyframes sway {
-  0%, 100% { transform: rotate(-2deg); }
-  50%      { transform: rotate(2deg); }
-}
-.animate-sway { animation: sway 3s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-in, .animate-pulse-gold, .animate-damascus, .animate-sway {
-    animation: none;
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
+.animate-damascus {
+  animation: damascus 2.6s ease-out forwards;
+}
 
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+.animate-sway {
+  animation: sway 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Keyboard focus rings: a gold ring only on keyboard nav, never on mouse click. */
 :focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 55%, transparent);
+  border-radius: 4px;
+}
+
+/* Honour reduced-motion: kill the decorative animation layer entirely. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

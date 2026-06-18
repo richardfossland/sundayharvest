@@ -4,6 +4,10 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { setIdentity, ensureHostId, bindHostSession } from '@/lib/identity'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { ErrorText } from '@/components/ui/ErrorText'
+import { cn } from '@/lib/cn'
 
 /** Normalise a scanned/typed code to the 4-letter shape the lobby uses. */
 function normalizeCode(raw: string | null): string {
@@ -77,22 +81,23 @@ function LandingInner() {
       <div className="animate-fade-in w-full">
         <div className="mb-8 text-center">
           <div className="mb-2 text-5xl animate-sway inline-block" aria-hidden>🌾</div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-[#E3B23C]">
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-gold">
             SundayHarvest
           </h1>
-          <p className="mt-2 text-sm text-[#9A92A8]">
+          <p className="mt-2 text-sm text-muted">
             La hveten og ugresset vokse sammen — til høsten.
           </p>
         </div>
 
-        <div className="mb-6 flex rounded-xl border border-[#352E47] bg-[#262035] p-1">
+        <div className="mb-6 flex rounded-xl border border-border bg-surface p-1">
           {(['join', 'host'] as const).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                mode === m ? 'bg-[#E3B23C] text-[#1A1626]' : 'text-[#9A92A8]'
-              }`}
+              className={cn(
+                'flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors',
+                mode === m ? 'bg-gold text-ink' : 'text-muted hover:text-text',
+              )}
             >
               {m === 'join' ? 'Bli med' : 'Vert'}
             </button>
@@ -101,48 +106,41 @@ function LandingInner() {
 
         {mode === 'join' ? (
           <div className="flex flex-col gap-3">
-            <input
+            <Input
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="Spillkode"
               maxLength={4}
               autoCapitalize="characters"
-              className="rounded-xl border border-[#352E47] bg-[#262035] px-4 py-3 text-center font-display text-2xl tracking-[0.3em] text-[#F2EFE6] placeholder:tracking-normal placeholder:text-base placeholder:text-[#9A92A8] focus:border-[#E3B23C] focus:outline-none"
+              aria-label="Spillkode"
+              className="text-center font-display text-2xl tracking-[0.3em] focus:border-gold placeholder:text-base placeholder:tracking-normal"
             />
-            <input
+            <Input
               ref={nameRef}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Navnet ditt"
               maxLength={24}
-              className="rounded-xl border border-[#352E47] bg-[#262035] px-4 py-3 text-[#F2EFE6] placeholder:text-[#9A92A8] focus:border-[#E3B23C] focus:outline-none"
+              aria-label="Navnet ditt"
             />
-            <button
-              onClick={join}
-              disabled={busy}
-              className="rounded-xl bg-[#6B8F5E] py-3 font-medium text-[#1A1626] transition-opacity disabled:opacity-50"
-            >
-              {busy ? '…' : 'Bli med i flokken'}
-            </button>
+            <Button variant="sage" onClick={join} disabled={busy}>
+              {busy ? 'Blir med…' : 'Bli med i flokken'}
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="text-center text-sm text-[#9A92A8]">
+            <p className="text-center text-sm text-muted">
               Opprett et spill og vis koden + storskjermen for gruppa. Trenger 5–10 spillere.
             </p>
-            <button
-              onClick={host}
-              disabled={busy}
-              className="rounded-xl bg-[#E3B23C] py-3 font-medium text-[#1A1626] transition-opacity disabled:opacity-50"
-            >
-              {busy ? '…' : 'Opprett spill'}
-            </button>
+            <Button onClick={host} disabled={busy}>
+              {busy ? 'Oppretter…' : 'Opprett spill'}
+            </Button>
           </div>
         )}
 
-        {error && <p className="mt-4 text-center text-sm text-[#8B3A3A]">{error}</p>}
+        {error && <ErrorText className="mt-4">{error}</ErrorText>}
 
-        <p className="mt-10 text-center text-xs leading-relaxed text-[#9A92A8]">
+        <p className="mt-10 text-center text-xs leading-relaxed text-muted">
           Ingen blir slått ut. Alle spiller hele veien. Du dømmer gjerninger — ikke hjerter.
         </p>
       </div>
@@ -156,7 +154,7 @@ function LandingShell() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-10">
       <div className="text-center">
         <div className="mb-2 inline-block animate-sway text-5xl" aria-hidden>🌾</div>
-        <h1 className="font-display text-4xl font-semibold tracking-tight text-[#E3B23C]">
+        <h1 className="font-display text-4xl font-semibold tracking-tight text-gold">
           SundayHarvest
         </h1>
       </div>

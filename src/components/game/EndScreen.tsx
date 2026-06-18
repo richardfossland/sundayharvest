@@ -33,47 +33,47 @@ export function EndScreen({ session }: { session: Session }) {
       <div className="animate-fade-in flex flex-col gap-6">
         <div className="text-center">
           <div className="mb-2 text-5xl" aria-hidden>{betrayerWin ? '🥀' : '🌾'}</div>
-          <h1 className="font-display text-3xl font-semibold text-[#E3B23C]">
+          <h1 className="font-display text-3xl font-semibold text-gold">
             {betrayerWin ? 'Forræderne vant' : 'Flokken seiret'}
           </h1>
           {judasWin && (
-            <p className="mt-2 text-sm text-[#9A92A8]">
+            <p className="mt-2 text-sm text-muted">
               Judas pekte ut Profeten — som han en gang pekte ut Mesteren med et kyss. Men husk
               hvordan det gikk med Judas (Matt 27).
             </p>
           )}
         </div>
 
-        <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-4">
+        <div className="rounded-2xl border border-border bg-surface p-4">
           <WorkTrack results={workResults(session)} />
-          <p className="mt-3 text-center text-xs text-[#9A92A8]">
+          <p className="mt-3 text-center text-xs text-muted">
             {session.fruit_works} bar frukt · {session.choked_works} visnet
           </p>
         </div>
 
         {rows && (
-          <div className="rounded-2xl border border-[#352E47] bg-[#262035] p-1">
+          <div className="rounded-2xl border border-border bg-surface p-1">
             {rows.map((r) => {
               const meta = ROLES[r.role]
               return (
                 <div
                   key={r.seat}
-                  className="flex items-center justify-between border-b border-[#352E47] px-3 py-2.5 last:border-0"
+                  className="flex items-center justify-between border-b border-border px-3 py-2.5 last:border-0"
                 >
                   <span className="flex items-center gap-2">
                     <span aria-hidden>{meta.emoji}</span>
-                    <span className="text-sm text-[#F2EFE6]">{r.name}</span>
+                    <span className="text-sm text-text">{r.name}</span>
                   </span>
                   <span className="text-right">
                     <span
                       className={`text-sm ${
-                        r.team === 'faithful' ? 'text-[#6B8F5E]' : 'text-[#cf8a8a]'
+                        r.team === 'faithful' ? 'text-sage' : 'text-blight-text'
                       }`}
                     >
                       {meta.label}
                     </span>
                     {r.converted && (
-                      <span className="block text-[10px] text-[#E3B23C]">
+                      <span className="block text-[10px] text-gold">
                         omvendte seg i gjerning {r.converted_on_work}
                       </span>
                     )}
@@ -130,13 +130,13 @@ function Debrief({ session, rows }: { session: Session; rows: RevealRow[] | null
   return (
     <>
       {ai && (
-        <div className="rounded-2xl border border-[#E3B23C]/40 bg-[#1A1626] p-5">
-          <p className="mb-2 text-xs uppercase tracking-wide text-[#9A92A8]">
+        <div className="rounded-2xl border border-gold/40 bg-field p-5">
+          <p className="mb-2 text-xs uppercase tracking-wide text-muted">
             Samtaleleder (KI-forslag)
           </p>
-          <p className="text-sm leading-relaxed text-[#F2EFE6]">{ai.andakt}</p>
-          <div className="mt-4 border-t border-[#352E47] pt-4">
-            <ul className="list-disc space-y-1.5 pl-5 text-sm text-[#F2EFE6]">
+          <p className="text-sm leading-relaxed text-text">{ai.andakt}</p>
+          <div className="mt-4 border-t border-border pt-4">
+            <ul className="list-disc space-y-1.5 pl-5 text-sm text-text">
               {ai.questions.map((q, i) => (
                 <li key={i}>{q}</li>
               ))}
@@ -150,7 +150,7 @@ function Debrief({ session, rows }: { session: Session; rows: RevealRow[] | null
           type="button"
           onClick={() => ask(ai ? 'more' : 'initial')}
           disabled={loading}
-          className="rounded-xl border border-[#E3B23C]/40 bg-[#262035] px-4 py-2 text-sm text-[#E3B23C] disabled:opacity-50"
+          className="rounded-xl border border-gold/40 bg-surface px-4 py-2 text-sm text-gold disabled:opacity-50"
         >
           {loading
             ? 'Henter…'
@@ -170,22 +170,22 @@ function StaticDebrief({ seed }: { seed: string }) {
   // game (see staticBank.ts) so replays get fresh framing without an AI key.
   const entry = pickStaticDebrief(seed)
   return (
-    <div className="rounded-2xl border border-[#E3B23C]/30 bg-[#1A1626] p-5">
-      <h2 className="font-display text-lg text-[#E3B23C]">{entry.title}</h2>
-      <div className="mt-3 space-y-3 text-sm leading-relaxed text-[#F2EFE6]">
+    <div className="rounded-2xl border border-gold/30 bg-field p-5">
+      <h2 className="font-display text-lg text-gold">{entry.title}</h2>
+      <div className="mt-3 space-y-3 text-sm leading-relaxed text-text">
         {entry.paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
       </div>
-      <div className="mt-4 border-t border-[#352E47] pt-4">
-        <p className="mb-2 text-xs uppercase tracking-wide text-[#9A92A8]">Til samtale</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-[#F2EFE6]">
+      <div className="mt-4 border-t border-border pt-4">
+        <p className="mb-2 text-xs uppercase tracking-wide text-muted">Til samtale</p>
+        <ul className="list-disc space-y-1.5 pl-5 text-sm text-text">
           {entry.questions.map((q, i) => (
             <li key={i}>{q}</li>
           ))}
         </ul>
       </div>
-      <p className="mt-4 text-center text-xs italic text-[#9A92A8]">{entry.verse}</p>
+      <p className="mt-4 text-center text-xs italic text-muted">{entry.verse}</p>
     </div>
   )
 }
