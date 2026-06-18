@@ -6,6 +6,7 @@ import { Session, RevealRow } from '@/types/game'
 import { ROLES } from '@/lib/config'
 import { WorkTrack } from './WorkTrack'
 import { workResults } from './PhaseBar'
+import { pickStaticDebrief } from '@/lib/debrief/staticBank'
 import type {
   DebriefContent,
   DebriefGameState,
@@ -159,39 +160,32 @@ function Debrief({ session, rows }: { session: Session; rows: RevealRow[] | null
         </button>
       </div>
 
-      <StaticDebrief />
+      <StaticDebrief seed={session.id} />
     </>
   )
 }
 
-function StaticDebrief() {
+function StaticDebrief({ seed }: { seed: string }) {
+  // One of several themed andakt/spørsmål variants, chosen deterministically per
+  // game (see staticBank.ts) so replays get fresh framing without an AI key.
+  const entry = pickStaticDebrief(seed)
   return (
     <div className="rounded-2xl border border-[#E3B23C]/30 bg-[#1A1626] p-5">
-      <h2 className="font-display text-lg text-[#E3B23C]">Hva handlet dette egentlig om?</h2>
+      <h2 className="font-display text-lg text-[#E3B23C]">{entry.title}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-[#F2EFE6]">
-        <p>
-          I lignelsen vil tjenerne luke ut ugresset med en gang. Herren sier nei:{' '}
-          <span className="italic">«La begge vokse sammen til høsten»</span> (Matt 13:30). Hvorfor?
-          Fordi vi ikke kan se hjertene — det kan bare Gud (1 Sam 16:7). Rollene i kveld var på
-          liksom. Ingen her er egentlig «ugress».
-        </p>
-        <p>
-          <span className="text-[#E3B23C]">Saulus og Judas</span> var begge forrædere. Den ene
-          omvendte seg; den andre fortvilte (Matt 27:3–5). Nåden var åpen for begge — også for
-          Judas. Spørsmålet er aldri «hvem er for langt borte til å bli reddet», men «vil jeg snu».
-        </p>
+        {entry.paragraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
       </div>
       <div className="mt-4 border-t border-[#352E47] pt-4">
         <p className="mb-2 text-xs uppercase tracking-wide text-[#9A92A8]">Til samtale</p>
         <ul className="list-disc space-y-1.5 pl-5 text-sm text-[#F2EFE6]">
-          <li>Var det vanskelig å ikke vite hvem du kunne stole på? Slik er det å leve sammen til høsten.</li>
-          <li>Saulus ga opp seieren <em>og</em> synet for å bli trofast. Hva koster det å snu på ordentlig?</li>
-          <li>Kunne Judas ha omvendt seg? Hva sier det om nåde?</li>
+          {entry.questions.map((q, i) => (
+            <li key={i}>{q}</li>
+          ))}
         </ul>
       </div>
-      <p className="mt-4 text-center text-xs italic text-[#9A92A8]">
-        «Ved dette blir min Far æret, at dere bærer mye frukt.» — Joh 15:8
-      </p>
+      <p className="mt-4 text-center text-xs italic text-[#9A92A8]">{entry.verse}</p>
     </div>
   )
 }
