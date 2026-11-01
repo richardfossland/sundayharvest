@@ -7,6 +7,7 @@ import { TWO_WEED_WORKS } from '@/lib/config'
 import { WorkTrack, RejectDots } from '@/components/game/WorkTrack'
 import { workResults } from '@/components/game/PhaseBar'
 import { QRCode } from '@/components/QRCode'
+import { useTavlevisning, AvsluttTavle } from '@/lib/client/storskjerm/TavleVisning'
 
 type VoteReveal = { approved: boolean; votes: { player_id: string; value: string }[] }
 type WorkReveal = { fruit: boolean; weeds: number; fruits: number }
@@ -18,6 +19,7 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   const [damascus, setDamascus] = useState<string | null>(null)
   const [voteReveal, setVoteReveal] = useState<VoteReveal | null>(null)
   const [workReveal, setWorkReveal] = useState<WorkReveal | null>(null)
+  const presentasjon = useTavlevisning()
   const supabase = createClient()
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   const nameOf = (id: string) => players.find((p) => p.id === id)?.name ?? '—'
   const leaderName = players.find((p) => p.seat === session?.leader_seat)?.name
 
-  if (!session) return <Screen><span className="text-muted">Laster…</span></Screen>
+  if (!session) return <Screen presentasjon={presentasjon} sessionId={sessionId}><span className="text-muted">Laster…</span></Screen>
 
   if (session.phase === 'lobby') {
     // Deep-link the QR straight into the join form with the code prefilled, so
@@ -53,7 +55,7 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
       typeof window !== 'undefined' ? window.location.origin : 'https://harvest.sundaysuite.app'
     const joinUrl = `${origin}/?code=${encodeURIComponent(session.code)}`
     return (
-      <Screen>
+      <Screen presentasjon={presentasjon} sessionId={sessionId}>
         <div className="flex flex-wrap items-center justify-center gap-12">
           <div>
             <p className="text-3xl text-muted">Spillkode</p>
@@ -78,7 +80,7 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   if (session.phase === 'ended') {
     const betrayerWin = session.outcome === 'betrayer_win'
     return (
-      <Screen>
+      <Screen presentasjon={presentasjon} sessionId={sessionId}>
         <div className="text-8xl">{betrayerWin ? '🥀' : '🌾'}</div>
         <h1 className="mt-4 font-display text-7xl text-gold">{betrayerWin ? 'Forræderne vant' : 'Flokken seiret'}</h1>
         <div className="mt-10"><WorkTrack results={workResults(session)} large /></div>
@@ -87,7 +89,7 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   }
 
   return (
-    <Screen>
+    <Screen presentasjon={presentasjon} sessionId={sessionId}>
       {damascus && (
         <div className="animate-damascus pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-gold">
           <p className="font-display text-6xl text-ink">⚡ {damascus} har omvendt seg</p>
@@ -139,10 +141,13 @@ export default function Projector({ params }: { params: Promise<{ sessionId: str
   )
 }
 
-function Screen({ children }: { children: React.ReactNode }) {
+function Screen({
+  children, presentasjon, sessionId,
+}: { children: React.ReactNode; presentasjon: boolean; sessionId: string }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-field px-12 py-12 text-center">
+    <main className={`flex min-h-screen flex-col items-center justify-center bg-field px-12 py-12 text-center${presentasjon ? ' presentasjon' : ''}`}>
       {children}
+      {presentasjon && <AvsluttTavle hostHref={`/host/${sessionId}`} />}
     </main>
   )
 }

@@ -9,6 +9,7 @@ import { TEAM_SIZES, BETRAYER_COUNT, MIN_PLAYERS, MAX_PLAYERS, ROLES } from '@/l
 import { buildRoleList, dealAssignments, DeckToggles } from '@/lib/deal'
 import { WorkTrack, RejectDots } from '@/components/game/WorkTrack'
 import { workResults } from '@/components/game/PhaseBar'
+import { StorskjermButton } from '@/lib/client/storskjerm/StorskjermButton'
 
 export default function HostPanel({ params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = use(params)
@@ -108,6 +109,7 @@ export default function HostPanel({ params }: { params: Promise<{ sessionId: str
           className="rounded-lg border border-border px-3 py-1.5 text-sm text-muted">
           Storskjerm ↗
         </Link>
+        <StorskjermButton projectorPath={`/host/${sessionId}/projector`} />
       </header>
 
       {session.phase === 'lobby' && (
