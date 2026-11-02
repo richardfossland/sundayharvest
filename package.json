@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.108.1",
+    "@supabase/supabase-js": "^2.118.0",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.48.0",
+    "lucide-react": "^1.65.0",
     "next": "16.4.3",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "esbuild": "^0.28.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^5.0.2",
+    "vitest": "^5.0.5",
     "wrangler": "^4.142.0"
   },
   "overrides": {
