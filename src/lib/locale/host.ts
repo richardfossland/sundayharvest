@@ -19,6 +19,9 @@ export const hostStrings = {
   sendError: 'Klarte ikke å sende lenken — sjekk adressen og prøv igjen.',
   authError: 'Innloggingen feilet. Prøv igjen.',
   backToPlay: 'Tilbake til forsiden',
+  loginDisabledTitle: 'Vertsinnlogging er ikke slått på',
+  loginDisabledLead:
+    'Du trenger ingen konto for å lede et spill — start en ny økt fra forsiden, så får du en spillkode deltakerne kan bli med på.',
 
   // dashboard
   dashTitle: 'Øktene mine',

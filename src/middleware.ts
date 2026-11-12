@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { hostLoginEnabled } from '@/lib/supabase/auth-config'
 import { sharedCookieOptions } from '@/lib/supabase/cookies'
 
 // SSO host middleware. Two jobs, scoped to the host/auth surface ONLY:
@@ -27,6 +28,10 @@ function isCodeBasedHostRoute(path: string): boolean {
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
+
+  // Host SSO not configured: nothing to refresh or gate. The pages render a
+  // "not enabled" notice instead of crashing on a client without URL/key.
+  if (!hostLoginEnabled()) return response
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUNDAY_AUTH_URL!,
