@@ -2,7 +2,9 @@ import { redirect } from 'next/navigation'
 
 import { getHostUser } from '@/lib/server/auth-host'
 import { listSessionsByOwner } from '@/lib/server/host-sessions'
+import { hostLoginEnabled } from '@/lib/supabase/auth-config'
 import { HostDashboard } from './HostDashboard'
+import { HostLoginDisabled } from './HostLoginDisabled'
 
 // Signed-in host dashboard ("Øktene mine"). Middleware already redirects
 // logged-OUT users to /host/login; this re-checks server-side (defense in depth)
@@ -12,6 +14,8 @@ import { HostDashboard } from './HostDashboard'
 export const dynamic = 'force-dynamic'
 
 export default async function HostDashboardPage() {
+  if (!hostLoginEnabled()) return <HostLoginDisabled />
+
   const user = await getHostUser()
   if (!user) redirect('/host/login')
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { hostLoginEnabled } from '@/lib/supabase/auth-config'
 import { createAuthClient } from '@/lib/supabase/auth-server'
 
 // OAuth / magic-link landing for the Sunday Account host login. Exchanges the
@@ -10,6 +11,9 @@ import { createAuthClient } from '@/lib/supabase/auth-server'
 // callback can't be turned into an open redirect.
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
+  // Host SSO not configured: there is no session to exchange.
+  if (!hostLoginEnabled()) return NextResponse.redirect(`${origin}/host`)
+
   const code = searchParams.get('code')
   const error = searchParams.get('error')
 

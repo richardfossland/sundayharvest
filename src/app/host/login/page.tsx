@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 import { createAuthBrowserClient } from '@/lib/supabase/auth-browser'
+import { hostLoginEnabled } from '@/lib/supabase/auth-config'
+import { HostLoginDisabled } from '../HostLoginDisabled'
 import { hostStrings as t } from '@/lib/locale/host'
 
 function HostLoginInner() {
@@ -110,6 +112,7 @@ function HostLoginInner() {
 }
 
 export default function HostLoginPage() {
+  if (!hostLoginEnabled()) return <HostLoginDisabled />
   return (
     <Suspense fallback={null}>
       <HostLoginInner />
